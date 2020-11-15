@@ -2,3 +2,6 @@
 __PYCACHE__
 credentials.py
 workspace.py
+credentials.json
+quickstart.py
+token.pickle
