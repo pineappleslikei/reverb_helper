@@ -5,7 +5,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 
 # If modifying these scopes, delete the file token.pickle.
-SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
+SCOPES = ['https://www.googleapis.com/auth/drive']
 
 
 def auth_flow():
@@ -30,18 +30,12 @@ def auth_flow():
     return creds
 
 
-def get_spreadsheet_values(spreadsheetId, spread_range):
+def get_drive_files():
     creds = auth_flow()
-    service = build('sheets', 'v4', credentials=creds)
-    ss_values = service.spreadsheets().values().get(
-        spreadsheetId=spreadsheetId, range=spread_range).execute()
-    return ss_values
+    service = build('drive', 'v3', credentials=creds)
+    results = service.files().list(
+        pageSize=10, fields="nextPageToken, files(id, name)").execute()
+    print(results['files'])
 
 
-def write_spreadsheet_values(spreadsheetId, spread_range, values):
-    creds = auth_flow()
-    service = build('sheets', 'v4', credentials=creds)
-    body = {'values': values}
-    response = service.spreadsheets().values().update(
-        spreadsheetId=spreadsheetId, range=spread_range, valueInputOption='RAW', body=body).execute()
-    print('{0} cells updated.'.format(response.get('updatedCells')))
+get_drive_files()
