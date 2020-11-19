@@ -30,12 +30,36 @@ def auth_flow():
     return creds
 
 
-def get_drive_files():
+def get_drive_files(product_name):
+    file_ids = []
+    links = []
     creds = auth_flow()
     service = build('drive', 'v3', credentials=creds)
     results = service.files().list(
-        pageSize=10, fields="nextPageToken, files(id, name)").execute()
-    print(results['files'])
+        q=f"name contains '{product_name}' and trashed = false", fields="nextPageToken, files(id, name, webViewLink)").execute()
+    for file in results['files']:
+        file_ids.append(file['id'])
+        links.append(file['webViewLink'])
+    return (file_ids, links)
 
 
-get_drive_files()
+def create_permissions(file_id):
+    creds = auth_flow()
+    service = build('drive', 'v3', credentials=creds)
+    user_permission = {
+        'type': 'anyone',
+        'role': 'reader'
+    }
+    results = service.permissions().create(
+        fileId=file_id, body=user_permission, fields='id').execute()
+    if results != {'id': 'anyoneWithLink'}:
+        print('Permissions change was unsuccessful')
+        return
+    return True
+
+
+def google_processing(listing_title):
+    file_ids_links = get_drive_files(listing_title)
+    for file in file_ids_links[0]:
+        create_permissions(file)
+    return file_ids_links[1]
