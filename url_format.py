@@ -1,6 +1,6 @@
 import re
 
-pattern = r'https://drive.google.com/file/d/[A-za-z0-9-]+/view[?]usp=sharing$'
+pattern = r'https://drive.google.com/file/d/[A-za-z0-9-]+/view[?]usp=drivesdk$'
 
 
 # make sure that the input is a google drive url pointing to a resource
@@ -28,3 +28,10 @@ def photo_id_strip(url):
 def url_format(photo_id):
     new_url = f'https://drive.google.com/uc?id={photo_id}&export=download'
     return new_url
+
+
+def url_pipe(url):
+    if url_validate(url):
+        res_id = photo_id_strip(url)
+        new_url = url_format(res_id)
+        return new_url
