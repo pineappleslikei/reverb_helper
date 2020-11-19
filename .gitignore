@@ -8,3 +8,6 @@ quickstart.py
 token.pickle
 token-sheets.pickle
 token-drive.pickle
+.DS_Store
+env/
+google_sheets.py
